@@ -1,11 +1,15 @@
 package tictactoe;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     public static Scanner scanner = new Scanner(System.in);
     public static char[][] table = new char[3][3];
-    public static char humanChar;
+    public static final char humanChar = 'X';
+    public static final char compChar = 'O';
+    public static final char emptyChar = ' ';
+
 
     public static void main(String[] args) {
         fillTheTable();
@@ -14,6 +18,34 @@ public class Main {
     }
 
     private static void play() {
+        int numEmptyCells = 9;
+        do {
+            humanMove();
+            printTable();
+            if (checkTable()) break;
+            numEmptyCells--;
+            computerMove(numEmptyCells--);
+            printTable();
+        } while(!checkTable());
+    }
+
+    private static void computerMove(int numEmptyCells) {
+        System.out.println("Making move level \"easy\"");
+        Random rng = new Random();
+
+        int n = rng.nextInt(numEmptyCells);
+
+        for (int i = 0; i < 9; i++) {
+            if (table[i / 3][i % 3] == emptyChar) {
+                if (n == 0) {
+                    table[i / 3][i % 3] = compChar;
+                    break;
+                } else n--;
+            }
+        }
+    }
+
+    private static void humanMove() {
         String input;
         int row;
         int col;
@@ -36,17 +68,15 @@ public class Main {
         }
 
         table[row - 1][col - 1] = humanChar;
-        printTable();
-        checkTable();
     }
 
-    private static void checkTable() {
+    private static boolean checkTable() {
         // Check rows
         for (int row = 0; row < 3; row++) {
             if (table[row][0] == ' ' || table[row][1] != table[row][0] || table[row][2] != table[row][0])
                 continue;
             System.out.println(table[row][0] + " wins");
-            return;
+            return true;
         }
 
         // Check columns
@@ -54,52 +84,38 @@ public class Main {
             if (table[0][col] == ' ' || table[1][col] != table[0][col] || table[2][col] != table[0][col])
                 continue;
             System.out.println(table[0][col] + " wins");
-            return;
+            return true;
         }
 
         // Check diagonal
         if (table[0][0] != ' ' && table[1][1] == table[0][0] && table[2][2] == table[0][0]) {
             System.out.println(table[0][0] + " wins");
-            return;
+            return true;
         }
 
         // Check other diagonal
         if (table[0][2] != ' ' && table[1][1] == table[0][2] && table[2][0] == table[0][2]) {
             System.out.println(table[0][2] + " wins");
-            return;
+            return true;
         }
 
         // Check draw
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col ++) {
                 if (table[row][col] == ' ') {
-                    System.out.println("Game not finished");
-                    return;
+                    return false;
                 }
             }
         }
 
         System.out.println("Draw");
+        return true;
     }
 
     private static void fillTheTable() {
-//        String input;
-//
-//        while (true) {
-//            System.out.print("Enter the cells: ");
-//            input = scanner.nextLine();
-//
-//            if (input.matches("[_XO]{9}")) break;
-//            System.out.println("Wrong input!");
-//        }
-//
-//        int numMoves = 0;
         for (int i = 0; i < 9; i++) {
-            table[i / 3][i % 3] = /*input.charAt(i) == '_' ?*/ ' ' /*: input.charAt(i)*/;
-//            if (input.charAt(i) == 'X') numMoves++;
-//            if (input.charAt(i) == 'O') numMoves--;
+            table[i / 3][i % 3] = emptyChar;
         }
-        humanChar = /*numMoves == 0 ?*/ 'X' /*: 'O'*/;
     }
 
     private static void printTable() {
